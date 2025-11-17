@@ -66,10 +66,17 @@
 
             if (response.status === "success") {
                 toast?.success("Autentificare reușită!", { duration: 5000 });
-                goto("/chat");
+              
+                const user = response.user as any;
+                if (!user.idFacultate || !user.idCicluStudii) {
+                    goto('/student-info');
+                } else {
+                    goto("/chat");
+                }
                 resetData(true);
             } else if (response.status === "invalid") {
                 toast?.error("Email sau parolă incorectă.", { duration: 5000 });
+
             } else {
                 toast?.error("Eroare la autentificare.", { duration: 5000 });
                 console.log("Eroare la login:", response.message);

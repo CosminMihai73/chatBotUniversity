@@ -6,8 +6,8 @@ export const load: PageServerLoad = async (event) => {
     throw redirect(302, '/');
   }
 
-  if (event.locals.needsProfileCompletion) {
-    throw redirect(302, '/student-info');
+  if (!event.locals.needsProfileCompletion) {
+    throw redirect(302, '/chat');
   }
 
   return {
