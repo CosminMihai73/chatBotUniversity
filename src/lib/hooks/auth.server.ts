@@ -13,18 +13,14 @@ const JWT_SECRET = getJwtSecret();
 export const handle: Handle = async ({ event, resolve }) => {
   const jwtCookie = event.cookies.get('jwt');
 
-  if (import.meta.env.DEV) {
-    console.debug('[auth] jwtCookie present:', !!jwtCookie);
-    if (!JWT_SECRET) console.debug('[auth] JWT secret is missing');
-  }
-
   if (jwtCookie && JWT_SECRET) {
     try {
       const user = jwt.verify(jwtCookie, JWT_SECRET) as { id: number; email: string; idFacultate?: number | null; idCicluStudii?: number | null };
-      if (import.meta.env.DEV) console.debug('[auth] JWT verified for user id:', (user as any).id);
-      // expose profile fields on locals
       event.locals.user = user;
       event.locals.needsProfileCompletion = !user.idFacultate || !user.idCicluStudii;
+      if (import.meta.env.DEV) {
+        console.debug('Authenticated user (from JWT):', user);
+      }
     } catch (err) {
       console.warn('JWT verification failed:', err);
       event.locals.user = undefined;
@@ -42,6 +38,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     const allowedPrefixes = [
       '/student-info',
       '/api/user/student-info',
+      '/api/utils/faculty',
+      '/api/utils/cicle',
       '/api/auth/logout',
       '/auth/logout',
       '/api/auth/login',
